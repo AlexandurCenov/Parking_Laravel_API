@@ -71,7 +71,7 @@ class ParkingController extends Controller
         $vehicle = new Vehicle();
         $vehicle->registration_number = $request->registration_number;
         $vehicle->vehicle_category_id = $getCategory[0]->id;
-        $vehicle->discount_card_id = $getDiscountCard[0]->id;
+        $vehicle->discount_card_id = $getDiscountCard[0]->id ?? null;
         $vehicle->save();
 
         // Remove free slot from Parking
