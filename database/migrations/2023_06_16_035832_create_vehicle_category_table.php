@@ -17,7 +17,7 @@ class CreateVehicleCategoryTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('category', 10);
-            $table->tinyInteger('number_of places');
+            $table->tinyInteger('number_of_places');
             $table->smallInteger('day_tariff');
             $table->smallInteger('night_tariff');
             $table->timestamp('created_at')->useCurrent();

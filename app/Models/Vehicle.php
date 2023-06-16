@@ -20,6 +20,8 @@ class Vehicle extends Model
         'discount_card_id',
     ];
 
+    public $timestamps = false;
+
     /**
      * Get vehicle category.
      *
