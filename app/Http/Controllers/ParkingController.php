@@ -128,12 +128,51 @@ class ParkingController extends Controller
     }
 
     /**
+     * Unregister a vehicle.
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function exit(Request $request)
+    {
+        // validate input data
+        $validator =  Validator::make($request->all(), [
+            'registration_number' => 'required|min:6',
+        ]);
+    
+        // when validation fail
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation fail',
+                'errors' => $validator->errors()
+            ], 401);
+        }
+
+        // Get vehicle by registration number
+        $vehicle = Vehicle::where('registration_number', $request->registration_number)->get();
+        // Check if there are a vehicle with that registration number
+        if ($vehicle->isEmpty()) {
+            return response()->json([
+                'message' => "Can't find a vehicle with the same registration number!",
+            ], 422);
+        }
+
+        // Calculate parking bill
+        $totalBill = $this->calculateParkingBill($request, true);
+
+        return response()->json([
+            'message' => 'Your parking bill is: ' . $totalBill . 'lv. Your vehicle was successfully unregistered.',
+        ], 200);
+    }
+
+    /**
      * Calculate parking bill.
      * 
      * @param Request $request
+     * @param boolean $isExit
      * @return number
      */
-    private function calculateParkingBill(Request $request)
+    private function calculateParkingBill(Request $request, $isExit = false)
     {
         $totalBill = 0;
 
@@ -208,6 +247,15 @@ class ParkingController extends Controller
         // Check if vehicle have discount card
         if ($vehicle[0]->card !== null) {
             $totalBill -= $totalBill * $vehicle[0]->card->discount;
+        }    
+
+        if ($isExit) {
+            // Free spaces in parking after unregistering the car
+            $parking->left_places += $vehicle[0]->category->number_of_places;
+            $parking->save();
+
+            // Delete vehicle from table
+            Vehicle::where('id', $vehicle->pluck('id'))->delete();
         }
 
         return $totalBill;
