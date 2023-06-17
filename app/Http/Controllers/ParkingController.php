@@ -43,80 +43,7 @@ class ParkingController extends Controller
             ], 401);
         }
 
-        $totalBill = 0;
-
-        // Get vehicle by registration number with category and card relations
-        $vehicle = Vehicle::with(['category', 'card'])
-            ->where('registration_number', $request->registration_number)
-            ->get();
-
-        // Get parking options    
-        $parking = Parking::find(1);
-        $dayTariffStart = Carbon::createFromFormat("H:i:s", $parking->day_shift_start);
-        $dayTariffEnd = Carbon::createFromFormat("H:i:s", $parking->day_shift_end);
-
-        // Set vehicle entry date and present date
-        $vehicleEntryDateTime = Carbon::createFromDate($vehicle[0]->entered_on);
-        $presentDateTime = Carbon::now();
-        $presentHoursLeft = ceil($presentDateTime->diffInMinutes($vehicleEntryDateTime) / 60);
-
-        // Rounding up the total hours
-        $totalHours = ceil($vehicleEntryDateTime->diffInMinutes($presentDateTime) / 60);
-
-        // Find total days and total hours left if total hours are equal or above 24h.
-        if ($totalHours >= 24) {
-            $totalDays = intval($totalHours / 24);
-            $presentHoursLeft = $totalHours % 24;
-            $totalBill += ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60) * $totalDays * $vehicle[0]->category->day_tariff;
-            $totalBill += (($totalDays * 24) - (ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60) * $totalDays)) * $vehicle[0]->category->night_tariff;
-            
-            // Adding full days
-            $vehicleEntryDateTime->addDays($totalDays);
-        }
-
-        // Check if entry time is before day tariff start
-        if ($vehicleEntryDateTime->lt($dayTariffStart)) {
-            // When exit time is before day tariff start
-            if ($presentDateTime->lt($dayTariffStart)) {
-                $totalBill += $presentHoursLeft * $vehicle[0]->category->night_tariff;
-            }
-
-            // When exit time is in day tariff range
-            if ($presentDateTime->gte($dayTariffStart) && $presentDateTime->lte($dayTariffEnd)) {
-                $totalBill += ceil($presentDateTime->diffInMinutes($dayTariffStart) / 60) * $vehicle[0]->category->day_tariff;
-                $totalBill += ceil($dayTariffStart->diffInMinutes($vehicleEntryDateTime) / 60) * $vehicle[0]->category->night_tariff;
-            }
-
-            // When exit time is after day tariff end
-            if ($presentDateTime->gt($dayTariffEnd)) {
-                $totalBill += ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60) * $vehicle[0]->category->day_tariff;
-                $totalBill += ($presentHoursLeft - ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60)) * $vehicle[0]->category->night_tariff;
-            }
-        }
-
-        // Check if entry time is in day tariff range
-        if ($vehicleEntryDateTime->gte($dayTariffStart) && $vehicleEntryDateTime->lte($dayTariffEnd)) {
-            // When exit time is in day tariff range
-            if ($presentDateTime->lte($dayTariffEnd)) {
-                $totalBill += $presentHoursLeft * $vehicle[0]->category->day_tariff;
-            }
-
-            // When exit time is after day tariff range
-            if ($presentDateTime->gt($dayTariffEnd)) {
-                $totalBill += ceil($dayTariffEnd->diffInMinutes($vehicleEntryDateTime) / 60) * $vehicle[0]->category->day_tariff;
-                $totalBill += ceil($presentDateTime->diffInMinutes($dayTariffEnd) / 60) * $vehicle[0]->category->night_tariff;
-            }
-        }
-
-        // Check if entry time is after day tariff range
-        if ($vehicleEntryDateTime->gt($dayTariffEnd)) {
-            $totalBill += $presentHoursLeft * $vehicle[0]->category->night_tariff;
-        }
-
-        // Check if vehicle have discount card
-        if ($vehicle[0]->card !== null) {
-            $totalBill -= $totalBill * $vehicle[0]->card->discount;
-        }
+        $totalBill = $this->calculateParkingBill($request);
 
         return response()->json([
             'message' => 'Your parking bill is: ' . $totalBill . 'lv.',
@@ -198,5 +125,91 @@ class ParkingController extends Controller
         return response()->json([
             'message' => 'Your vehicle was succesfully registered in parking.',
         ], 200);
+    }
+
+    /**
+     * Calculate parking bill.
+     * 
+     * @param Request $request
+     * @return number
+     */
+    private function calculateParkingBill(Request $request)
+    {
+        $totalBill = 0;
+
+        // Get vehicle by registration number with category and card relations
+        $vehicle = Vehicle::with(['category', 'card'])
+            ->where('registration_number', $request->registration_number)
+            ->get();
+
+        // Get parking options    
+        $parking = Parking::find(1);
+        $dayTariffStart = Carbon::createFromFormat("H:i:s", $parking->day_shift_start);
+        $dayTariffEnd = Carbon::createFromFormat("H:i:s", $parking->day_shift_end);
+
+        // Set vehicle entry date and present date
+        $vehicleEntryDateTime = Carbon::createFromDate($vehicle[0]->entered_on);
+        $presentDateTime = Carbon::now();
+        $presentHoursLeft = ceil($presentDateTime->diffInMinutes($vehicleEntryDateTime) / 60);
+
+        // Rounding up the total hours
+        $totalHours = ceil($vehicleEntryDateTime->diffInMinutes($presentDateTime) / 60);
+
+        // Find total days and total hours left if total hours are equal or above 24h.
+        if ($totalHours >= 24) {
+            $totalDays = intval($totalHours / 24);
+            $presentHoursLeft = $totalHours % 24;
+            $totalBill += ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60) * $totalDays * $vehicle[0]->category->day_tariff;
+            $totalBill += (($totalDays * 24) - (ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60) * $totalDays)) * $vehicle[0]->category->night_tariff;
+            
+            // Adding full days
+            $vehicleEntryDateTime->addDays($totalDays);
+        }
+
+        // Check if entry time is before day tariff start
+        if ($vehicleEntryDateTime->lt($dayTariffStart)) {
+            // When exit time is before day tariff start
+            if ($presentDateTime->lt($dayTariffStart)) {
+                $totalBill += $presentHoursLeft * $vehicle[0]->category->night_tariff;
+            }
+
+            // When exit time is in day tariff range
+            if ($presentDateTime->gte($dayTariffStart) && $presentDateTime->lte($dayTariffEnd)) {
+                $totalBill += ceil($presentDateTime->diffInMinutes($dayTariffStart) / 60) * $vehicle[0]->category->day_tariff;
+                $totalBill += ceil($dayTariffStart->diffInMinutes($vehicleEntryDateTime) / 60) * $vehicle[0]->category->night_tariff;
+            }
+
+            // When exit time is after day tariff end
+            if ($presentDateTime->gt($dayTariffEnd)) {
+                $totalBill += ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60) * $vehicle[0]->category->day_tariff;
+                $totalBill += ($presentHoursLeft - ceil($dayTariffEnd->diffInMinutes($dayTariffStart) / 60)) * $vehicle[0]->category->night_tariff;
+            }
+        }
+
+        // Check if entry time is in day tariff range
+        if ($vehicleEntryDateTime->gte($dayTariffStart) && $vehicleEntryDateTime->lte($dayTariffEnd)) {
+            // When exit time is in day tariff range
+            if ($presentDateTime->lte($dayTariffEnd)) {
+                $totalBill += $presentHoursLeft * $vehicle[0]->category->day_tariff;
+            }
+
+            // When exit time is after day tariff range
+            if ($presentDateTime->gt($dayTariffEnd)) {
+                $totalBill += ceil($dayTariffEnd->diffInMinutes($vehicleEntryDateTime) / 60) * $vehicle[0]->category->day_tariff;
+                $totalBill += ceil($presentDateTime->diffInMinutes($dayTariffEnd) / 60) * $vehicle[0]->category->night_tariff;
+            }
+        }
+
+        // Check if entry time is after day tariff range
+        if ($vehicleEntryDateTime->gt($dayTariffEnd)) {
+            $totalBill += $presentHoursLeft * $vehicle[0]->category->night_tariff;
+        }
+
+        // Check if vehicle have discount card
+        if ($vehicle[0]->card !== null) {
+            $totalBill -= $totalBill * $vehicle[0]->card->discount;
+        }
+
+        return $totalBill;
     }
 }
