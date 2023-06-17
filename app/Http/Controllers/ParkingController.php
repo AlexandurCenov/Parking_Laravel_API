@@ -8,6 +8,7 @@ use App\Models\Parking;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ParkingController extends Controller
 {
@@ -32,7 +33,16 @@ class ParkingController extends Controller
         // validate input data
         $validator =  Validator::make($request->all(), [
             'registration_number' => 'required|min:6',
-            'category' => 'required',
+            'category' => [
+                'required',
+                Rule::in(['Car', 'Motor', 'Van', 'Bus', 'Truck']),
+            ],
+            'discount_card' => [
+                'nullable',
+                'string',
+                Rule::in(['Silver', 'Gold', 'Platinum']),
+            ],
+            'entered_on' => 'nullable|date_format:Y-m-d H:i:s'
         ]);
     
         // when validation fail
@@ -77,7 +87,7 @@ class ParkingController extends Controller
         if (isset($request->entered_on) && $request->entered_on != '') {
             $vehicle->entered_on = $request->entered_on;
         }
-        
+
         $vehicle->save();
 
         // Remove free slot from Parking
