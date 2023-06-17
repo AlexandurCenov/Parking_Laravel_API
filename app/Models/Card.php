@@ -7,5 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
 {
-    use HasFactory;    
+    use HasFactory;
+    
+    /**
+     * Card has many vehicles
+     *
+     * @return BelongsTo
+     */
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class);
+    }
 }

@@ -28,9 +28,10 @@ class VehicleController extends Controller
             ], 401);
         }
 
-        $vehicle = Vehicle::with(['category'])->get();
-        // $vehicle = Vehicle::with(['category'])->get();
-        // ->where('registration_number', $request->registration_number)
+        $vehicle = Vehicle::with(['category', 'card'])
+            ->where('registration_number', $request->registration_number)
+            ->get()
+            ->toArray(); 
         
         echo "<pre>";
         print_r($vehicle);

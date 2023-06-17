@@ -16,8 +16,8 @@ class Vehicle extends Model
      */
     protected $fillable = [
         'registration_number',
-        'vehicle_category_id',
-        'discount_card_id',
+        'category_id',
+        'card_id',
     ];
 
     public $timestamps = false;
@@ -27,18 +27,18 @@ class Vehicle extends Model
      *
      * @return HasOne
      */
-    protected function category()
-    {
-        return $this->belongsTo(VehicleCategory::class, 'id', 'category_id');
-    }
+    public function category()
+{
+    return $this->belongsTo(Category::class);
+}
 
     /**
      * Get vehicle discount card.
      *
      * @return HasOne
      */
-    protected function discountCard()
+    public function card()
     {
-        return $this->hasOne(DiscountCard::class, 'id', 'card_id');
+        return $this->belongsTo(Card::class);
     }
 }

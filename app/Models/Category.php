@@ -10,12 +10,12 @@ class Category extends Model
     use HasFactory;
 
     /**
-     * Get vehicle discount card.
+     * Category has many vehicles
      *
      * @return BelongsTo
      */
-    protected function vehicles()
+    public function vehicles()
     {
-        return $this->hasMany(Vehicle::class,'category_id', 'id');
+        return $this->hasMany(Vehicle::class);
     }
 }
