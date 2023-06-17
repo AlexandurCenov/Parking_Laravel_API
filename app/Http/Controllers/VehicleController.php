@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vehicle;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -30,11 +31,19 @@ class VehicleController extends Controller
 
         $vehicle = Vehicle::with(['category', 'card'])
             ->where('registration_number', $request->registration_number)
-            ->get()
-            ->toArray(); 
+            ->get();
+
+        $vehicleEntryDateTime = Carbon::createFromDate($vehicle[0]->entered_on);
+        
+        $presentDateTime = Carbon::now()->format('Y-m-d H:i:s');
+
+        $totalHours = $vehicleEntryDateTime->diffInHours($presentDateTime);
+
+        // Find total day hours
+        
         
         echo "<pre>";
-        print_r($vehicle);
+        print_r($totalHours);
         die();
     
     }
