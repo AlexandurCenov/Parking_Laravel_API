@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDiscountCardsTable extends Migration
+class CreateCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreateDiscountCardsTable extends Migration
      */
     public function up()
     {
-        Schema::create('discount_cards', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->float('discount');
+            $table->string('category', 10);
+            $table->tinyInteger('number_of_places');
+            $table->smallInteger('day_tariff');
+            $table->smallInteger('night_tariff');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
@@ -29,6 +32,6 @@ class CreateDiscountCardsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('discount_cards');
+        Schema::dropIfExists('categories');
     }
 }

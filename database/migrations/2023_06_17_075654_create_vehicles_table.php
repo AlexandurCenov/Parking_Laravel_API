@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVehicleTable extends Migration
+class CreateVehiclesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,13 +16,13 @@ class CreateVehicleTable extends Migration
         Schema::create('vehicles', function (Blueprint $table) {
             $table->increments('id');
             $table->string('registration_number');
-            $table->integer('vehicle_category_id', false, true);
-            $table->integer('discount_card_id', false, true)->nullable();
+            $table->integer('category_id', false, true);
+            $table->integer('card_id', false, true)->nullable();
             $table->timestamp('entered_on')->useCurrent();
 
             // Foreign keys
-            $table->foreign('vehicle_category_id')->references('id')->on('vehicle_categories');
-            $table->foreign('discount_card_id')->references('id')->on('discount_cards');
+            $table->foreign('category_id')->references('id')->on('categories');
+            $table->foreign('card_id')->references('id')->on('cards');
         });
     }
 

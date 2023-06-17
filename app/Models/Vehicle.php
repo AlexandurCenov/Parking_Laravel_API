@@ -25,20 +25,20 @@ class Vehicle extends Model
     /**
      * Get vehicle category.
      *
-     * @return BelongsTo
+     * @return HasOne
      */
     protected function category()
     {
-        return $this->belongsTo(VehicleCategory::class, 'vehicle_category_id');
+        return $this->belongsTo(VehicleCategory::class, 'id', 'category_id');
     }
 
     /**
      * Get vehicle discount card.
      *
-     * @return BelongsTo
+     * @return HasOne
      */
     protected function discountCard()
     {
-        return $this->belongsTo(DiscountCard::class, 'discount_card_id');
+        return $this->hasOne(DiscountCard::class, 'id', 'card_id');
     }
 }
