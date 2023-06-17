@@ -28,9 +28,9 @@ class Vehicle extends Model
      * @return HasOne
      */
     public function category()
-{
-    return $this->belongsTo(Category::class);
-}
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     /**
      * Get vehicle discount card.

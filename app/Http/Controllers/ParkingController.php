@@ -72,6 +72,12 @@ class ParkingController extends Controller
         $vehicle->registration_number = $request->registration_number;
         $vehicle->category_id = $getCategory[0]->id;
         $vehicle->card_id = $getDiscountCard[0]->id ?? null;
+
+        // get vehicle entered_on if exist on input data
+        if (isset($request->entered_on) && $request->entered_on != '') {
+            $vehicle->entered_on = $request->entered_on;
+        }
+        
         $vehicle->save();
 
         // Remove free slot from Parking
