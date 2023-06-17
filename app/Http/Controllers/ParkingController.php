@@ -58,7 +58,7 @@ class ParkingController extends Controller
         // Set vehicle entry date and present date
         $vehicleEntryDateTime = Carbon::createFromDate($vehicle[0]->entered_on);
         $presentDateTime = Carbon::now();
-        // $presentHoursLeft = ceil($presentDateTime->diffInMinutes($vehicleEntryDateTime) / 60);
+        $presentHoursLeft = ceil($presentDateTime->diffInMinutes($vehicleEntryDateTime) / 60);
 
         // Rounding up the total hours
         $totalHours = ceil($vehicleEntryDateTime->diffInMinutes($presentDateTime) / 60);
