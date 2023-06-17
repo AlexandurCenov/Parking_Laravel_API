@@ -25,4 +25,3 @@ Route::get('/parking-spaces', [ParkingController::class, 'getSpaces']);
 Route::get('/check-bill', [ParkingController::class, 'getBill']);
 Route::post('/enter-parking', [ParkingController::class, 'enter']);
 Route::delete('/exit-parking', [ParkingController::class, 'exit']);
-
