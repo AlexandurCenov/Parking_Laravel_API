@@ -7,9 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
 {
-    use HasFactory;
-
-    protected $table = 'discount_cards';
-
-    
+    use HasFactory;    
 }

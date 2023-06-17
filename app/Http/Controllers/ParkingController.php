@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DiscountCard;
+use App\Models\Card;
+use App\Models\Category;
 use App\Models\Parking;
 use App\Models\Vehicle;
-use App\Models\VehicleCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -52,7 +52,7 @@ class ParkingController extends Controller
         }
 
         // get vehicle category
-        $getCategory = VehicleCategory::where('name', $request->category)->get();
+        $getCategory = Category::where('name', $request->category)->get();
 
         // Check if there are free spaces on the parking
         $freeParkingSpaces = Parking::find(1);
@@ -64,14 +64,14 @@ class ParkingController extends Controller
         
         // get discount card if exist on input data
         if (isset($request->discount_card) && $request->discount_card != '') {
-            $getDiscountCard = DiscountCard::where('name', $request->discount_card)->get();
+            $getDiscountCard = Card::where('name', $request->discount_card)->get();
         }    
 
         // register new vehicle in the parking
         $vehicle = new Vehicle();
         $vehicle->registration_number = $request->registration_number;
-        $vehicle->vehicle_category_id = $getCategory[0]->id;
-        $vehicle->discount_card_id = $getDiscountCard[0]->id ?? null;
+        $vehicle->category_id = $getCategory[0]->id;
+        $vehicle->card_id = $getDiscountCard[0]->id ?? null;
         $vehicle->save();
 
         // Remove free slot from Parking

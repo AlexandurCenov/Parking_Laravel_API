@@ -9,8 +9,6 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $table = 'vehicle_categories';
-
     /**
      * Get vehicle discount card.
      *
