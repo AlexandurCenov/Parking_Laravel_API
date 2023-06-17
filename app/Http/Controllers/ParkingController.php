@@ -6,6 +6,7 @@ use App\Models\Card;
 use App\Models\Category;
 use App\Models\Parking;
 use App\Models\Vehicle;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -20,6 +21,64 @@ class ParkingController extends Controller
     public function getSpaces()
     {
         return ["Free spaces" => Parking::find(1)->left_places];
+    }
+
+    /**
+     * Check bill.
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getBill(Request $request)
+    {
+        // validate input data
+        $validator =  Validator::make($request->all(), [
+            'registration_number' => 'required|min:6',
+        ]);
+
+        // when validation fail
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation fail',
+                'errors' => $validator->errors()
+            ], 401);
+        }
+
+        // Get vehicle by registration number with category and card relations
+        $vehicle = Vehicle::with(['category', 'card'])
+            ->where('registration_number', $request->registration_number)
+            ->get();
+
+        // Set vehicle entry date and present date
+        $vehicleEntryDateTime = Carbon::createFromDate($vehicle[0]->entered_on);
+        $presentDateTime = Carbon::now()->format('Y-m-d H:i:s');
+
+        // Rounding up the total hours
+        $totalHours = ceil($vehicleEntryDateTime->diffInMinutes($presentDateTime) / 60);
+
+        // Find total days and total hours left if total hours are equal or above 24h.
+        if ($totalHours >= 24) {
+            $totalDays = intval($totalHours / 24);
+            $todayHoursLeft = $totalHours % 24;
+
+
+
+        }
+
+        // if ($totalHours < 24) {
+        //     $totalDays = intval($totalHours / 24);
+        //     $todayHoursLeft = $totalHours % 24;
+        // }
+
+
+        
+        echo "<pre>";
+        print_r($vehicleEntryDateTime->toTimeString());
+        echo "<pre>";
+        print_r($totalDays);
+        echo "<pre>";
+        print_r($todayHoursLeft);
+        die();
+    
     }
 
     /**

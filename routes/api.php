@@ -22,8 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Parking routes
 Route::get('/parking-spaces', [ParkingController::class, 'getSpaces']);
+Route::get('/check-bill', [ParkingController::class, 'getBill']);
 Route::post('/enter-parking', [ParkingController::class, 'enter']);
-Route::post('/exit-parking', [ParkingController::class, 'exit']);
+Route::delete('/exit-parking', [ParkingController::class, 'exit']);
 
-//Vehicle routes
-Route::get('/check-bill', [VehicleController::class, 'getBill']);
