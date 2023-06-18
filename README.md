@@ -2,52 +2,61 @@
 
 ## Steps to use the API:
 
-### you need db connection
-### copy .env.example into .env
-### update DB... variables in .env with your own database properties
-### Create tables in your database
+1. you need db connection
+2. copy .env.example into .env
+3. update DB... variables in .env with your own database properties
+4. Create tables in your database
   ```sh
     php artisan migrate
   ```
 
-### Fill your tables with default data
+5. Fill your tables with default data
   ```sh
     php artisan db:seed
   ```
 
-### Run your server via
+6. Run your server via
   ```sh
     php artisan serve
   ```
 
-### or your own server
+ * or your own server
 
-### endpoints that can be used
+7. endpoints that can be used
 - Check free spaces : /api/parking-spaces
 
-- Check parking bill : /api/check-bill
+- Check parking bill :
+```sh
+  $${\color{orange}/api/check-bill}$$
+```
   * JSON example
-    ```sh
-      {
-        "registration_number": "СA3386TB"
-      }
-    ```
+  ```sh
+    {
+      "registration_number": "СA3386TB"
+    }
+  ```
 
-- Enter in to the parking : /api/enter-parking
+- Enter in to the parking :
+```sh
+  $${\color{orange}/api/enter-parking}$$
+```
   * JSON example
-    ```sh
-      {
-        "registration_number": "СA3295A",
-        "category": "Car",
-        "discount_card": "Silver",
-        "entered_on": "2023-06-15 07:12:37"
-      }
-    ```
+  ```sh
+    {
+      "registration_number": "СA3295A",
+      "category": "Car",
+      "discount_card": "Silver",
+      "entered_on": "2023-06-15 07:12:37"
+    }
+  ```
 
-- Exit from the parking : /api/exit-parking
+- Exit from the parking :
+```sh
+  $${\color{orange}/api/exit-parking}$$
+```
   * JSON example
-    ```sh
-      {
-        "registration_number": "СA3395A"
-      }
-    ```
+  ```sh
+    {
+      "registration_number": "СA3395A"
+    }
+  ```
