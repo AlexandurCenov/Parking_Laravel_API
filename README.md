@@ -27,7 +27,7 @@
 
 - Check parking bill :
 ```sh
-  $${\color{orange}/api/check-bill}$$
+  /api/check-bill
 ```
   * JSON example
   ```sh
@@ -38,7 +38,7 @@
 
 - Enter in to the parking :
 ```sh
-  $${\color{orange}/api/enter-parking}$$
+  /api/enter-parking
 ```
   * JSON example
   ```sh
@@ -52,7 +52,7 @@
 
 - Exit from the parking :
 ```sh
-  $${\color{orange}/api/exit-parking}$$
+  /api/exit-parking}
 ```
   * JSON example
   ```sh
